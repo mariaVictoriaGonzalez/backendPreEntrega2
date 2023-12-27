@@ -28,35 +28,39 @@ router.get("/:cid", async (req, res) => {
 });
 
 router.post("/:cid/products/:pid", async (req, res) => {
-    try {
-      const { cid, pid } = req.params;
-      const productId = pid;
-      const quantity = req.body.quantity;
-      const cartId = cid;
-  
-      const cart = await cartsDao.getCartById(cartId); // Busco el carrito
-  
-      if (cart) {
-        const product = await productsDao.getProductById(productId); // Si existe el carrito busco el producto
-        if (product) {
-          const index = cart.products.findIndex((item) => item._id.toString() === productId); // Veo si ya existe el prod en el carrito
-          if (index !== -1) {
-            cart.products[index].quantity += 1; // Si ya existe, le sumo a quantity
-          } else {
-            cart.products.push({ _id: productId, quantity: quantity }); // Si no existe, lo pusheo
-          }
-          const respuesta = await cartsDao.updateCart(cartId, cart); // Updateo el carrito
-          res.status(200).json({ respuesta: "OK", mensaje: respuesta });
+  try {
+    const { cid, pid } = req.params;
+    const productId = pid;
+    const quantity = req.body.quantity;
+    const cartId = cid;
+
+    const cart = await cartsDao.getCartById(cartId);
+
+    if (cart) {
+      const product = await productsDao.getProductById(productId);
+
+      if (product) {
+        const index = cart.products.findIndex((item) => item.product.equals(productId));
+
+        if (index !== -1) {
+          cart.products[index].quantity += quantity;
         } else {
-          res.status(404).json({ error: "Product not found." });
+          cart.products.push({ product: productId, quantity: quantity });
         }
+
+        const response = await cartsDao.updateCart(cartId, cart);
+
+        res.status(200).json({ response: "OK", message: response });
       } else {
-        res.status(404).json({ error: "Cart not found." });
+        res.status(404).json({ error: "Product not found." });
       }
-    } catch (error) {
-      console.error("Error adding product to cart:", error);
-      res.status(500).json({ error: "Internal Server Error." });
+    } else {
+      res.status(404).json({ error: "Cart not found." });
     }
-  });
+  } catch (error) {
+    console.error("Error adding product to cart:", error);
+    res.status(500).json({ error: "Internal Server Error." });
+  }
+});
   
   export default router;

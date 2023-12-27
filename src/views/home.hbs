@@ -17,6 +17,15 @@
       </li>
     {{/each}}
   </ul>
+
+  </table>
+      {{#if productos.prevPage}}
+  <button> <a href="/?page={{productos.prevPage}}">Anterior</a></button>
+  {{/if}}
+    {{#if productos.nextPage}}
+  <button> <a href="/?page={{productos.nextPage}}">Siguiente</a></button>
+  {{/if}}
+  </div>
 </div>
 
 <script src="/js/add.products.js"></script>

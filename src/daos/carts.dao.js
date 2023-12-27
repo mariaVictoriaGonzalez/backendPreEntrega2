@@ -27,7 +27,17 @@ class CartDao {
 
   async updateCart(cid, cart) {
     try {
-      return await cartModel.findByIdAndUpdate(cid, cart);
+      const updatedCart = await cartModel.findByIdAndUpdate(
+        cid,
+        { $set: { products: cart.products } },
+        { new: true }
+      );
+
+      if (!updatedCart) {
+        throw new Error("Cart not found");
+      }
+
+      return updatedCart;
     } catch (error) {
       throw new Error(`Error updating cart: ${error.message}`);
     }
@@ -51,11 +61,17 @@ class CartDao {
 
   async getProductsFromCart(cid) {
     try {
-      return await cartModel.findById(cid).populate("products.product").exec();
+      return await cartModel
+        .findOne({ _id: cid })
+        .populate({
+          path: "products.product",
+          model: "products",
+        })
+        .exec();
     } catch (error) {
       throw new Error(`Error getting products from cart: ${error.message}`);
     }
   }
-}
+    }
 
 export default new CartDao();
