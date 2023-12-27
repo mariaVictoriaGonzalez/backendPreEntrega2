@@ -27,11 +27,9 @@ class CartDao {
 
   async updateCart(cid, cart) {
     try {
-      const updatedCart = await cartModel.findByIdAndUpdate(
-        cid,
-        { $set: { products: cart.products } },
-        { new: true }
-      );
+      const updatedCart = await cartModel.updateOne(
+
+        { _id:cid },cart);
 
       if (!updatedCart) {
         throw new Error("Cart not found");
