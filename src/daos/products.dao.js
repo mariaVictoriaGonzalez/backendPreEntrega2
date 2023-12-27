@@ -3,15 +3,31 @@ import { productModel } from "./models/products.model.js";
 
 class ProductDao {
   async getAllProducts(limit = 10, page = 1, query, sort) {
-    let consulta = {};
-    if (query != undefined) {
-      consulta[query.split(":")[0]] = query.split(":")[1];
+    try {
+      limit = parseInt(limit) || 10;
+      page = parseInt(page) || 1;
+
+      let consulta = {};
+
+      if (query) {
+        const [campo, valor] = query.split(":");
+        if (campo && valor) {
+          consulta[campo] = valor;
+        }
+      }
+
+      const options = {
+        limit,
+        page,
+        sort: sort ? { price: Number(sort) } : {},
+      };
+
+      const result = await productModel.paginate(consulta, options);
+      return result;
+    } catch (error) {
+      console.error("Error en getAllProducts:", error);
+      throw error; 
     }
-    return await productModel.paginate(consulta, {
-      limit: limit,
-      page: page,
-      sort: sort == undefined ? {} : { price: Number(sort) },
-    });
   }
 
   async getProductById(_id) {

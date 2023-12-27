@@ -19,8 +19,23 @@ router.get("/:cid", async (req, res) => {
     const { cid } = req.params;
     const cartWithProducts = await cartsDao.getProductsFromCart(cid);
 
-     res.json(cartWithProducts);
-    console.log(cartWithProducts)
+    res.json(cartWithProducts);
+    console.log(cartWithProducts);
+  } catch (error) {
+    console.error("Error getting cart with products:", error);
+    res.status(500).json({ error: "Internal Server Error." });
+  }
+});
+
+router.delete("/:cid", async (req, res) => {
+  try {
+    const { cid } = req.params;
+    const deletedCart = await cartsDao.getCartById(cid);
+    deletedCart.products = [];
+
+    let updatedCart = await cartsDao.updateCart(cid, deletedCart);
+    res.json(updatedCart);
+    console.log(updatedCart);
   } catch (error) {
     console.error("Error getting cart with products:", error);
     res.status(500).json({ error: "Internal Server Error." });
@@ -40,7 +55,9 @@ router.post("/:cid/products/:pid", async (req, res) => {
       const product = await productsDao.getProductById(productId);
 
       if (product) {
-        const index = cart.products.findIndex((item) => item.product.equals(productId));
+        const index = cart.products.findIndex((item) =>
+          item.product.equals(productId)
+        );
 
         if (index !== -1) {
           cart.products[index].quantity += quantity;
@@ -62,5 +79,5 @@ router.post("/:cid/products/:pid", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error." });
   }
 });
-  
-  export default router;
+
+export default router;

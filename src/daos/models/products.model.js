@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import mongoosePaginate from 'mongoose-paginate-v2'
+import mongoosePaginate from "mongoose-paginate-v2";
 
 let productModel;
 
@@ -22,4 +22,3 @@ try {
 }
 
 export { productModel };
-
