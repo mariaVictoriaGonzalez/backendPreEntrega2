@@ -4,12 +4,26 @@ import productsDao from "../daos/products.dao.js";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const newCart = await cartsDao.createCart();
     res.json({ newCartId: newCart._id });
   } catch (error) {
     console.error("Error creating a new cart:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/", async (req, res) => {
+  try {
+    const cartsToRender = await cartsDao.getAllCarts();
+    console.log(cartsToRender);
+
+    const cartIds = cartsToRender.map(cart => cart._id);
+
+    res.json({ cartIds });
+  } catch (error) {
+    console.error("Error getting all carts:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -143,6 +157,7 @@ router.put("/:cid/products/:pid", async (req, res) => {
     const cid = req.params.cid;
     const pid = req.params.pid;
     const cart = await cartsDao.getCartById(cid);
+    const product = await productsDao.getProductById(pid);
 
     const index = cart.products.findIndex((item) => item.product.equals(pid));
 

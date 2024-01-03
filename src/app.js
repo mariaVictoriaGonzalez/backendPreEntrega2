@@ -44,7 +44,7 @@ app.engine(
 app.set("views", `${__dirname}/views`);
 app.set("view engine", "hbs");
 
-app.use(express.static(`${__dirname}/public`));
+app.use(express.static(__dirname+'/public'));
 
 const httpServer = app.listen(PORT, () =>
   console.log("Servidor en el puerto 8080 esta activo.")
